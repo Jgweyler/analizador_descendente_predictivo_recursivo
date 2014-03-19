@@ -48,6 +48,7 @@ String::tokens = ->
     end: "END"
     var: "VAR"
     const: "CONST"
+    procedure: "PROCEDURE"
     call: "CALL"
     procedure: "PROCEDURE"
     while: "WHILE"
@@ -135,6 +136,94 @@ parse = (input) ->
             lookahead.value + "' near '" + 
             input.substr(lookahead.from) + "'"
     return
+
+  program = ->
+    result = block()
+    if lookahead and lookahead.type is "."
+      match "."
+    else
+      throw "Syntax Error. Expected '.' Remember to end
+                 your input with a ."
+    result
+
+  block = ->
+    arrayres = []
+
+    if lookahead and lookahead.type is "CONST"
+       match "CONST"
+       constante = ->
+         result = null
+         if lookahead and lookahead.type is "ID"
+           left =
+             type: "Const ID"
+             value: lookahead.value
+           match "ID"
+           match "="
+           if lookahead and lookahead.type is "NUM"
+             right =
+               type: "NUM"
+               value: lookahead.value
+             match "NUM"
+           else # Error!
+             throw "Syntax Error. Expected NUM but found " + 
+                   (if lookahead then lookahead.value else "end of input") + 
+                   " near '#{input.substr(lookahead.from)}'"
+         else # Error!
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
+         result =
+           type: "="
+           left: left
+           right: right
+         result
+       arrayres.push constante()
+       while lookahead and lookahead.type is ","
+         match ","
+         arrayres.push constante()
+       match ";"
+    
+    if lookahead and lookahead.type is "VAR"
+       match "VAR"
+       variable = ->
+         result = null
+         if lookahead and lookahead.type is "ID"
+           result =
+             type: "Var ID"
+             value: lookahead.value
+           match "ID"
+         else # Error!
+           throw "Syntax Error. Expected ID but found " + 
+                 (if lookahead then lookahead.value else "end of input") + 
+                 " near '#{input.substr(lookahead.from)}'"
+         result
+       arrayres.push variable()
+       while lookahead and lookahead.type is ","
+         match ","
+         arrayres.push variable()
+       match ";"
+  
+    proced = ->
+      result = null
+      match "PROCEDURE"
+      if lookahead and lookahead.type is "ID"
+        value = lookahead.value
+        match "ID"
+        match ";"
+        result =
+          type: "Procedure"
+          value: value
+          left: block()
+        match ";" 
+      else # Error!
+        throw "Syntax Error. Expected ID but found " + 
+              (if lookahead then lookahead.value else "end of input") + 
+              " near '#{input.substr(lookahead.from)}'"
+      result
+    while lookahead and lookahead.type is "PROCEDURE"
+      arrayres.push proced()
+    arrayres.push statement()
+    arrayres 
 
   statements = ->
     result = [statement()]
@@ -272,3 +361,5 @@ parse = (input) ->
       "Expected 'end of input' and found '" + 
       input.substr(lookahead.from) + "'"  
   tree
+
+window.parse = parse
