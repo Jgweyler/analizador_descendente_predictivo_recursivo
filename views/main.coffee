@@ -52,6 +52,7 @@ String::tokens = ->
     procedure: "PROCEDURE"
     while: "WHILE"
     do: "DO"
+    odd: "ODD"
   
   # Make a token object.
   make = (type, value) ->
@@ -200,34 +201,43 @@ parse = (input) ->
     result
 
   condition = ->
-    left = expression()
-    type = lookahead.value
-    match "COMPARISON"
-    right = expression()
-    result =
-      type: type
-      left: left
-      right: right
+    if lookahead and lookahead.type is "ODD"
+      match "ODD"
+      right = expression()
+      result =
+        type: "ODD"
+        value: right
+    else
+      left = expression()
+      type = lookahead.value
+      match "COMPARISON"
+      right = expression()
+      result =
+        type: type
+        left: left
+        right: right
     result
 
   expression = ->
     result = term()
-    if lookahead and lookahead.type is "+"
-      match "+"
-      right = expression()
+    while lookahead and lookahead.type is "ADDOP"
+      type = lookahead.value
+      match "ADDOP"
+      right = term()
       result =
-        type: "+"
+        type: type
         left: result
         right: right
     result
 
   term = ->
     result = factor()
-    if lookahead and lookahead.type is "*"
-      match "*"
-      right = term()
+    if lookahead and lookahead.type is "MULTOP"
+      type = lookahead.value
+      match "MULTOP"
+      right = factor()
       result =
-        type: "*"
+        type: type
         left: result
         right: right
     result
