@@ -36,12 +36,22 @@ String::tokens = ->
     ONELINECOMMENT: /\/\/.*/g
     MULTIPLELINECOMMENT: /\/[*](.|\n)*?[*]\//g
     COMPARISONOPERATOR: /[<>=!]=|[<>]/g
-    ONECHAROPERATORS: /([-+*\/=()&|;:,{}[\]])/g
+    ADDOP: /[+-]/g
+    MULTOP: /[*\/]/g
+    ONECHAROPERATORS: /([=()&|;:,{}[\]])/g
 
   RESERVED_WORD = 
-    p:    "P"
-    "if": "IF"
+    p: "P"
+    if: "IF"
     then: "THEN"
+    begin: "BEGIN"
+    end: "END"
+    var: "VAR"
+    const: "CONST"
+    call: "CALL"
+    procedure: "PROCEDURE"
+    while: "WHILE"
+    do: "DO"
   
   # Make a token object.
   make = (type, value) ->
