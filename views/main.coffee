@@ -114,7 +114,7 @@ String::tokens = ->
     # multop
     else if m = tokens.MULTOP.bexec(this)
       result.push make("MULTOP", getTok())
-      
+
     # single-character operator
     else if m = tokens.ONECHAROPERATORS.bexec(this)
       result.push make(m[0], getTok())
@@ -169,6 +169,28 @@ parse = (input) ->
       right = statement()
       result =
         type: "IF"
+        left: left
+        right: right
+    else if lookahead and lookahead.type is "BEGIN"
+      match "BEGIN"
+      result = [statement()]  # It could be more than one.
+      while lookahead and lookahead.type is ";"
+        match ";"
+        resut.push statement()
+      match "END"
+    else if lookahead and lookahead.type is "CALL"
+      match "CALL"
+      result =
+        type: "CALL"
+        value: lookahead.value
+      match "ID"
+    else if lookahead and lookahead.type is "WHILE"
+      match "WHILE"
+      left = condition()
+      match "DO"
+      right = statement()
+      result =
+        type: "WHILE"
         left: left
         right: right
     else # Error!
