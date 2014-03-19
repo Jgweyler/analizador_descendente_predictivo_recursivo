@@ -42,6 +42,10 @@ get '/' do
   slim :home
 end
 
+get '/tests' do
+  slim :tests
+end
+
 get '/grammar' do
   slim :grammar
 end
