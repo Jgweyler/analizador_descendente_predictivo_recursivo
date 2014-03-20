@@ -1,10 +1,15 @@
-#mocha
-javascript:
-  mocha.run();
+doctype html
+html
+  head
+    title Mocha
+    meta content=("text/html; charset=UTF-8") http-equiv="Content-Type" 
+      meta content="width=device-width, initial-scale=1.0" name="viewport" 
+        link href="/tests/mocha.css" rel="stylesheet" /
+  body
+    #mocha
+    script src="tests/chai.js" 
+    script src="tests/mocha.js" 
     javascript:
-  function dump(fileName) {
-    $.get(fileName, function (data) {
-      $("#input").val(data);
-    });
-  };
-   
+      | mocha.setup('tdd')    %script{:src => "tests/tests.js"}
+    javascript:
+      | mocha.run();
